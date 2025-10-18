@@ -35,19 +35,27 @@ public interface BookMapper {
     /**
      * BookRequest → Book Entity 변환
      *
-     * @Mapping: 필드명이 다르거나 변환 로직이 필요한 경우 사용
-     * - target: Entity의 필드명
-     * - source: DTO의 필드명
-     * - ignore = true: 해당 필드는 매핑하지 않음
+     * 여러 파라미터를 사용하므로 default 메서드로 직접 구현
      *
      * @param request BookRequest DTO
      * @param bookId 생성할 Book의 ID (UUID v7)
      * @return Book Entity
      */
-    @Mapping(target = "bookId", source = "bookId")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    Book toEntity(BookRequest request, String bookId);
+    default Book toEntity(BookRequest request, String bookId) {
+        return Book.builder()
+                .bookId(bookId)
+                .title(request.getTitle())
+                .author(request.getAuthor())
+                .isbn(request.getIsbn())
+                .publisher(request.getPublisher())
+                .price(request.getPrice())
+                .stockQuantity(request.getStockQuantity())
+                .description(request.getDescription())
+                .category(request.getCategory())
+                .status(request.getStatus())
+                .publishedAt(request.getPublishedAt())
+                .build();
+    }
 
     /**
      * Book Entity → BookResponse 변환

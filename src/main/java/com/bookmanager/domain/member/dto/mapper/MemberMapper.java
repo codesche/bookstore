@@ -20,16 +20,23 @@ public interface MemberMapper {
     /**
      * MemberRequest → Member Entity 변환
      *
+     * 여러 파라미터를 사용하므로 default 메서드로 직접 구현
+     *
      * @param request MemberRequest DTO
      * @param memberId 생성할 Member의 ID (UUID v7)
      * @param encodedPassword 암호화된 비밀번호
      * @return Member Entity
      */
-    @Mapping(target = "memberId", source = "memberId")
-    @Mapping(target = "password", source = "encodedPassword")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    Member toEntity(MemberRequest request, String memberId, String encodedPassword);
+    default Member toEntity(MemberRequest request, String memberId, String encodedPassword) {
+        return Member.builder()
+                .memberId(memberId)
+                .email(request.getEmail())
+                .password(encodedPassword)
+                .name(request.getName())
+                .phone(request.getPhone())
+                .status(request.getStatus())
+                .build();
+    }
 
     /**
      * Member Entity → MemberResponse 변환
@@ -45,24 +52,15 @@ public interface MemberMapper {
 
     /**
      * MemberUpdateRequest → Member Entity 필드 업데이트
-     *
-     * @MappingTarget: 업데이트할 대상 Entity 지정
-     * @Mapping(target = "memberId", ignore = true): ID는 변경하지 않음
-     * @Mapping(target = "email", ignore = true): 이메일은 변경하지 않음
-     * @Mapping(target = "password", ignore = true): 비밀번호는 별도 메서드로 관리
-     * @Mapping(target = "status", ignore = true): 상태는 별도 메서드로 관리
-     *
      * name과 phone만 업데이트
-     * 비밀번호 변경은 서비스 레이어에서 별도로 처리
-     *
+     * 비밀번호 변경은 서비스 레이어에서 Member.changePassword() 메서드를 사용하여 별도로 처리
      * @param updateRequest MemberUpdateRequest DTO
      * @param member 업데이트할 Member Entity
      */
-    @Mapping(target = "memberId", ignore = true)
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromDto(MemberUpdateRequest updateRequest, @MappingTarget Member member);
+    default void updateEntityFromDto(MemberUpdateRequest updateRequest, Member member) {
+        if (updateRequest == null || member == null) {
+            return;
+        }
+        member.updateMemberInfo(updateRequest.getName(), updateRequest.getPhone());
+    }
 }
