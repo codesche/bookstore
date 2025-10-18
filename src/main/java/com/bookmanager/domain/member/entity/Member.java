@@ -1,4 +1,4 @@
-package com.bookmanager.domain.book.member;
+package com.bookmanager.domain.member.entity;
 
 import com.bookmanager.common.MemberStatus;
 import com.bookmanager.config.BaseTimeEntity;
