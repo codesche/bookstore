@@ -34,6 +34,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // MapStruct - DTO 변환을 위한 라이브러리
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    // Lombok + MapStruct 함께 사용 시 필요한 설정
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
     // Database Drivers
     // H2 - 테스트용 인메모리 데이터베이스
     runtimeOnly 'com.h2database:h2'
