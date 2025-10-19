@@ -78,7 +78,7 @@ public interface BookMapper {
      * 목록 조회 시 사용하는 간단한 응답 DTO
      *
      * @param book Book Entity
-     * @return BooksummaryResponse DTO
+     * @return BookSummaryResponse DTO
      */
     @Mapping(target = "status", expression = "java(book.getStatus().name())")
     BookSummaryResponse toSummaryResponse(Book book);
