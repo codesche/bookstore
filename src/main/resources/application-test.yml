@@ -6,6 +6,11 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
+  # SQL 스크립트 실행 비활성화 (Hibernate가 자동으로 스키마 생성)
+  sql:
+    init:
+      mode: never
+
   # H2 콘솔 활성화 (테스트 중 데이터 확인용)
   h2:
     console:
@@ -18,7 +23,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
-    # SQL 쿼리 로깅
+    # SQL 쿼리 로깅 (단순하게 show-sql만 사용)
     show-sql: true
 
     properties:
@@ -43,7 +48,8 @@ logging:
   level:
     root: INFO
     com.example.bookstore: DEBUG
-    org.hibernate.SQL: DEBUG
+    # Hibernate SQL 로깅 제거 (중복 방지)
+    # org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     # TestContainers 로깅
     org.testcontainers: INFO
