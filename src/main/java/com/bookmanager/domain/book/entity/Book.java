@@ -14,18 +14,23 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Persistable;
 
 /**
  * 도서 정보를 관리하는 엔티티 클래스
  *
  * @NoArgsConstructor(access = AccessLevel.PROTECTED): JPA는 기본 생성자가 필요하지만,
  * 외부에서 직접 생성하는 것을 막기 위해 protected로 설정
+ *
+ * Persistable 인터페이스 구현:
+ * - ID를 직접 할당하는 경우, JPA가 새 엔티티인지 기존 엔티티인지 판단하기 위해 SELECT를 실행함
+ * - Persistable.isNew()를 구현하여 불필요한 SELECT 방지
  */
 @Entity
 @Table(name = "book")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Book extends BaseTimeEntity {
+public class Book extends BaseTimeEntity implements Persistable<String> {
 
     /**
      * 도서 고유 ID
@@ -186,6 +191,27 @@ public class Book extends BaseTimeEntity {
      */
     public void changeStatus(BookStatus status) {
         this.status = status;
+    }
+
+    /**
+     * Persistable 인터페이스 구현
+     * ID를 반환 (JPA가 엔티티 식별에 사용)
+     */
+    @Override
+    public String getId() {
+        return bookId;
+    }
+
+    /**
+     * Persistable 인터페이스 구현
+     * 새 엔티티인지 판단
+     *
+     * @return createdAt이 null이면 새 엔티티, 아니면 기존 엔티티
+     * 이 메서드가 true를 반환하면 JPA는 SELECT 없이 바로 INSERT를 실행
+     */
+    @Override
+    public boolean isNew() {
+        return getCreatedAt() == null;
     }
 
 }
