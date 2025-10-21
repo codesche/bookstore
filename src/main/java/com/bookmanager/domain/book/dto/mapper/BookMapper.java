@@ -83,26 +83,21 @@ public interface BookMapper {
     @Mapping(target = "status", expression = "java(book.getStatus().name())")
     BookSummaryResponse toSummaryResponse(Book book);
 
-    /**
-     * BookRequest.Update → Book Entity 필드 업데이트
-     *
-     * @MappingTarget: 업데이트할 대상 Entity 지정
-     * @Mapping(target = "bookId", ignore = true): ID는 변경하지 않음
-     * @Mapping(target = "isbn", ignore = true): ISBN은 변경하지 않음
-     * @Mapping(target = "stockQuantity", ignore = true): 재고는 별도 메서드로 관리
-     * @Mapping(target = "status", ignore = true): 상태는 별도 메서드로 관리
-     *
-     * @param updateRequest BookUpdateRequest DTO
-     * @param book 업데이트할 Book Entity
-     */
-    @Mapping(target = "bookId", ignore = true)
-    @Mapping(target = "isbn", ignore = true)
-    @Mapping(target = "stockQuantity", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "publishedAt", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromDto(BookUpdateRequest updateRequest, @MappingTarget Book book);
+    default void updateEntityFromDto(BookUpdateRequest updateRequest, @MappingTarget Book book) {
+       if (updateRequest == null) {
+           return;
+       }
+
+        // Book의 기존 updateBookInfo 메서드 활용
+        book.updateBookInfo(
+            updateRequest.getTitle(),
+            updateRequest.getAuthor(),
+            updateRequest.getPublisher(),
+            updateRequest.getPrice(),
+            updateRequest.getDescription(),
+            updateRequest.getCategory()
+        );
+    }
 
 
 }
