@@ -1,5 +1,6 @@
 package com.bookmanager.domain.member.dto.mapper;
 
+import com.bookmanager.common.MemberStatus;
 import com.bookmanager.domain.member.dto.request.MemberRequest;
 import com.bookmanager.domain.member.dto.request.MemberUpdateRequest;
 import com.bookmanager.domain.member.dto.response.MemberResponse;
@@ -34,7 +35,7 @@ public interface MemberMapper {
                 .password(encodedPassword)
                 .name(request.getName())
                 .phone(request.getPhone())
-                .status(request.getStatus())
+                .status(request.getStatus() != null ? request.getStatus() : MemberStatus.ACTIVE)
                 .build();
     }
 
@@ -43,11 +44,12 @@ public interface MemberMapper {
      *
      * @Mapping(target = "status", expression = "..."):
      * - Enum을 String으로 변환 시 name() 메서드 사용
+     * - null-safe: status가 null이면 null 반환
      *
      * @param member Member Entity
      * @return MemberResponse DTO
      */
-    @Mapping(target = "status", expression = "java(member.getStatus().name())")
+    @Mapping(target = "status", expression = "java(member.getStatus() != null ? member.getStatus().name() : null)")
     MemberResponse toResponse(Member member);
 
     /**
