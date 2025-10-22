@@ -58,7 +58,7 @@ public class MemberService {
         log.info("회원 조회 - ID: {}", memberId);
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException(memberId));
+            .orElseThrow(() -> MemberNotFoundException.withMemberId(memberId));
 
         return memberMapper.toResponse(member);
     }
