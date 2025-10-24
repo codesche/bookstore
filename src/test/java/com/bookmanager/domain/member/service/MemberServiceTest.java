@@ -21,6 +21,8 @@ import com.bookmanager.domain.member.dto.response.MemberResponse;
 import com.bookmanager.domain.member.entity.Member;
 import com.bookmanager.domain.member.repository.MemberRepository;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +31,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 @ExtendWith(MockitoExtension.class)
@@ -200,6 +206,52 @@ class MemberServiceTest {
             .isInstanceOf(MemberNotFoundException.class);
 
         verify(memberRepository, times(1)).findByEmail(anyString());
+    }
+
+    @Test
+    @DisplayName("전체 회원 목록 조회 테스트 (페이징)")
+    void getAllMembers() {
+        // given - Mock 페이지 데이터 생성
+        List<Member> memberList = Arrays.asList(testMember);
+        Page<Member> memberPage = new PageImpl<>(memberList);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        given(memberRepository.findAll(pageable)).willReturn(memberPage);
+        given(memberMapper.toResponse(any(Member.class))).willReturn(testMemberResponse);
+
+        // when
+        Page<MemberResponse> response = memberService.getAllMembers(pageable);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).getEmail()).isEqualTo("test@example.com");
+
+        verify(memberRepository, times(1)).findAll(pageable);
+    }
+
+    @Test
+    @DisplayName("이름으로 회원 검색 테스트")
+    void searchMembersByName() {
+        // given
+        List<Member> memberList = Arrays.asList(testMember);
+        Page<Member> memberPage = new PageImpl<>(memberList);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        given(memberRepository.findByNameContaining(anyString(), any(Pageable.class)))
+            .willReturn(memberPage);
+        given(memberMapper.toResponse(any(Member.class))).willReturn(testMemberResponse);
+
+        // when
+        Page<MemberResponse> response = memberService.searchMembersByName("홍길동", pageable);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).getName()).contains("홍길동");
+
+        verify(memberRepository,
+            times(1)).findByNameContaining(anyString(), any(Pageable.class));
     }
 
 
